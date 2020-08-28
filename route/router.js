@@ -1,16 +1,23 @@
 const express=require('express')
 const router=express.Router()
 const connection=require('../config')
-router.post('/register',(req,res)=>{
-   
-    const today= new Date()
+const bycrypt=require('bcrypt')
+
+
+router.post('/register', async(req,res)=>{
+ 
+   const today= new Date()
+   const salt= await bycrypt.genSalt(10)
+   const password= await bycrypt.hash(req.body.password,salt)
    const users ={
-       "name":req.body.name,
-       "email":req.body.email,
-       "password":req.body.password,
-      "created_at":today,
-       "updated_at":today
-   }
+    "name":req.body.name,
+    "email":req.body.email,
+    "password":password,
+    "created_at":today,
+    "updated_at":today
+}
+   
+   
    connection.query('INSERT INTO users SET ?',users, function (error, results, fields) {
     if (error) {
       res.json({
